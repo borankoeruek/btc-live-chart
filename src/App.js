@@ -29,7 +29,7 @@ class App extends Component {
     let chartPrices = [];
 
     for (let x = 0; x < data.length; x++) {
-      chartDates.push(new Date(data[x].time));
+      chartDates.push(new Date(data[x].time * 1000));
       chartPrices.push(data[x].close);
     }
 
@@ -53,7 +53,7 @@ class App extends Component {
         const shallowCopyDates = [...this.state.chartDates];
         const shallowCopyPrices = [...this.state.chartPrices];
 
-        shallowCopyDates.push(new Date(data.time));
+        shallowCopyDates.push(new Date(data.time * 1000));
         shallowCopyPrices.push(data.close);
         // add item to sate
 
