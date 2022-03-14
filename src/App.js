@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import Plot from "react-plotly.js";
-import "./css/app.css";
-import BtcDataProvder from "./helpers/BtcDataProvider";
+import CryptoDataProvder from "./helpers/CryptoDataProvider";
+import { Col, Container, Row } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 class App extends Component {
   constructor() {
     super();
-    this.btcDataProvder = new BtcDataProvder();
+    this.cryptoDataProvder = new CryptoDataProvder();
 
     this.state = {
       chartDates: [],
@@ -20,7 +21,7 @@ class App extends Component {
   };
 
   loadBtcHistoryData = async () => {
-    const response = await this.btcDataProvder.getHistoryData("BTC", 50);
+    const response = await this.cryptoDataProvder.getHistoryData("BTC", 90);
 
     console.log(response);
 
@@ -28,26 +29,29 @@ class App extends Component {
     let chartDates = [];
     let chartPrices = [];
 
-    for (let x = 0; x < data.length; x++) {
-      chartDates.push(new Date(data[x].time * 1000));
-      chartPrices.push(data[x].close);
-    }
+    data.forEach((item) => {
+      chartDates.push(new Date(item.time * 1000));
+      chartPrices.push(item.close);
+    });
 
     this.setState({ chartDates, chartPrices });
   };
 
   startIntervalFetcher = async () => {
-    // get last Btc history data
+    const ONE_MINUTE_IN_MS = 60000;
 
     setInterval(async () => {
-      const response = await this.btcDataProvder.getHistoryData("BTC", 1);
+      // get last Btc history data
+      const response = await this.cryptoDataProvder.getHistoryData("BTC", 1);
 
       const data = response.Data.Data[0];
 
-      // if last ur record time is the time from the last record + 60 seconds
+      console.log(data);
+
+      // if last our record time is >= the last record + 60 seconds
       if (
-        +new Date(data.time) ===
-        +this.state.chartDates[this.state.chartDates.length - 1] + 60
+        data.time * 1000 >=
+        +this.state.chartDates[this.state.chartDates.length - 1] + 60000
       ) {
         console.log("Last record changed!");
         const shallowCopyDates = [...this.state.chartDates];
@@ -55,7 +59,6 @@ class App extends Component {
 
         shallowCopyDates.push(new Date(data.time * 1000));
         shallowCopyPrices.push(data.close);
-        // add item to sate
 
         this.setState(
           { chartDates: shallowCopyDates, chartPrices: shallowCopyPrices },
@@ -64,35 +67,31 @@ class App extends Component {
           }
         );
       }
-    }, 10000);
+    }, ONE_MINUTE_IN_MS);
   };
 
   render() {
     return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "95vh",
-        }}
-      >
-        <Plot
-          data={[
-            {
-              x: this.state.chartDates,
-              y: this.state.chartPrices,
-              type: "scatter",
-              mode: "lines",
-            },
-          ]}
-          layout={{
-            font: { size: 14 },
-            title: "BTC Live Chart",
-          }}
-          //config={{ responsive: true }}
-        />
-      </div>
+      <Container>
+        <Row className="mt-5 justify-content-center">
+          <Col className="ms-4"></Col>
+          <Plot
+            data={[
+              {
+                x: this.state.chartDates,
+                y: this.state.chartPrices,
+                type: "scatter",
+                mode: "lines",
+              },
+            ]}
+            layout={{
+              font: { size: 14 },
+              title: "BTC Live Chart",
+            }}
+            config={{ responsive: true }}
+          />
+        </Row>
+      </Container>
     );
   }
 }

@@ -1,6 +1,6 @@
 import accessConfig from "./accessConfig.json";
 
-class BtcDataProvider {
+class CryptoDataProvider {
   constructor() {
     this.apiKey = accessConfig.apiKey;
   }
@@ -35,4 +35,4 @@ class BtcDataProvider {
   };
 }
 
-export default BtcDataProvider;
+export default CryptoDataProvider;
