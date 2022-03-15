@@ -74,7 +74,6 @@ class App extends Component {
     return (
       <Container>
         <Row className="mt-5 justify-content-center">
-          <Col className="ms-4"></Col>
           <Plot
             data={[
               {
